@@ -1,0 +1,12 @@
+FIT2099 A1 WBA
+Yue Ling & Runzhe Hua
+
+1. UML class diagrams
+(1) Runzhe creates initial UML
+(2) Yue gives advice and improves UML
+(3) Excepted completion date: May 9 (as we were regrouped on May 7)
+
+2. Design rationale
+(1) Runzhe explains how the system will work
+(2) Yue explains the choices we made
+(3) Excepted completion date: May 10
