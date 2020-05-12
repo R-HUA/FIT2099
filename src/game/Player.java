@@ -30,5 +30,6 @@ public class Player extends Human {
 		if (lastAction.getNextAction() != null)
 			return lastAction.getNextAction();
 		return menu.showMenu(this, actions, display);
+		//if hit zombie, it may fall to pieces
 	}
 }

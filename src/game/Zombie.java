@@ -16,6 +16,8 @@ import edu.monash.fit2099.engine.IntrinsicWeapon;
  *
  */
 public class Zombie extends ZombieActor {
+	private int arm_no;
+	private int leg_no;
 	private Behaviour[] behaviours = {
 			new AttackBehaviour(ZombieCapability.ALIVE),
 			new HuntBehaviour(Human.class, 10),
@@ -24,12 +26,15 @@ public class Zombie extends ZombieActor {
 
 	public Zombie(String name) {
 		super(name, 'Z', 100, ZombieCapability.UNDEAD);
+		arm_no=2;
+		leg_no=2;
 	}
 	
 
 	@Override
 	public IntrinsicWeapon getIntrinsicWeapon() {
-		return new IntrinsicWeapon(10, "punches");
+		return new IntrinsicWeapon(10, "punches"); //50% (using rand.nextBoolean() )
+		// 50% bite (do more damage)
 	}
 
 	/**
@@ -43,6 +48,8 @@ public class Zombie extends ZombieActor {
 	 */
 	@Override
 	public Action playTurn(Actions actions, Action lastAction, GameMap map, Display display) {
+		//Every turn, each Zombie should have a 10% chance of saying ¡°Braaaaains¡± (or something similarly Zombie-like)
+		//check the number of arms and legs 
 		for (Behaviour behaviour : behaviours) {
 			Action action = behaviour.getAction(this, map);
 			if (action != null)
