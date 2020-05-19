@@ -36,9 +36,15 @@ public class AttackAction extends Action {
 	public String execute(Actor actor, GameMap map) {
 
 		Weapon weapon = actor.getWeapon();
-		
-		// add code (The bite attack should have a lower chance of hitting than the punch attack)
-		// A successful bite attack restores 5 health points to the Zombie £¨action.heal£©
+		// The bite attack should have a lower chance of hitting than the punch attack(Added a decision on missing)
+		if (weapon.verb() == "bites") {
+			if (rand.nextBoolean()) {
+				return actor + " misses " + target + ".";
+			} else {
+				// A successful bite attack restores 5 health points to the Zombie 
+				actor.heal(5);
+			}
+		}
 		
 		if (rand.nextBoolean()) {
 			return actor + " misses " + target + ".";
