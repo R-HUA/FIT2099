@@ -5,8 +5,10 @@ import edu.monash.fit2099.engine.Action;
 import edu.monash.fit2099.engine.Actions;
 import edu.monash.fit2099.engine.Display;
 import edu.monash.fit2099.engine.DoNothingAction;
+import edu.monash.fit2099.engine.DropItemAction;
 import edu.monash.fit2099.engine.GameMap;
 import edu.monash.fit2099.engine.IntrinsicWeapon;
+import edu.monash.fit2099.engine.Item;
 
 /**
  * A Zombie.
@@ -20,6 +22,7 @@ public class Zombie extends ZombieActor {
 
 	private int arm_no;
 	private int leg_no;
+	private int turn;
 
 	/**
 	 * Random number generator
@@ -35,18 +38,19 @@ public class Zombie extends ZombieActor {
 		super(name, 'Z', 100, ZombieCapability.UNDEAD);
 		arm_no = 2;
 		leg_no = 2;
+		turn=0;
 	}
 
 	@Override
 	public IntrinsicWeapon getIntrinsicWeapon() {
 		// 50% probability of using bite instead of punch
-		if (rand.nextBoolean()) {
+		// If a Zombie loses one arm, its probability of punching (rather than biting) is halved
+		if (rand.nextInt(100) * (arm_no / 2) < 50) {
 			return new IntrinsicWeapon(10, "punches");
 		}
-		else {
-			// The bite attack should do more damage.
-			return new IntrinsicWeapon(20, "bites");
-		}
+		// The bite attack should do more damage.
+		return new IntrinsicWeapon(20, "bites");
+		
 	}
 
 	/**
@@ -60,18 +64,58 @@ public class Zombie extends ZombieActor {
 	 */
 	@Override
 	public Action playTurn(Actions actions, Action lastAction, GameMap map, Display display) {
+		turn+=1;
 		// Every turn, each  Zombie have a 10% chance of saying ¡°Braaaaains¡±
 		if (rand.nextInt(100) < 10) {
 			Behaviour theBehaviour = new SayBehaviour();
 			return theBehaviour.getAction(this, map);
 		}
-		// TODO check the number of arms and legs
-		// 
-		for (Behaviour behaviour : behaviours) {
-			Action action = behaviour.getAction(this, map);
-			if (action != null)
-				return action;
+		// check the number of arms and legs
+		//TODO
+		if (arm_no == 0) {
+			for (Item item : this.getInventory()) {
+				this.removeItemFromInventory(item);
+				map.locationOf(this).addItem(item);
+			}
+		}
+		if (leg_no == 0 || (leg_no == 1 && turn % 2 != 0)) {
+			Behaviour[] thisBehaviours = { new AttackBehaviour(ZombieCapability.ALIVE), new PickItemBehaviour() };
+			for (Behaviour behaviour : thisBehaviours) {
+				Action action = behaviour.getAction(this, map);
+				if (action != null)
+					return action;
+			}
+		} 
+		else {
+			for (Behaviour behaviour : behaviours) {
+				Action action = behaviour.getAction(this, map);
+				if (action != null)
+					return action;
+			}
 		}
 		return new DoNothingAction();
 	}
+	/**
+	
+	 */
+	@Override
+	public void hurt(int points) {
+		hitPoints -= points;
+		//Any attack on a Zombie that causes damage has a chance to knock at least one of its limbs off (25%)
+		if (rand.nextInt(100) < 25) {
+			if (rand.nextBoolean()) {
+				arm_no -= 1;
+				arm_no = Math.max(0, arm_no);
+				System.out.println(this+" lost its arm");
+				// TODO  Lost limbs drop to the ground
+				//map.locationOf(this).addItem(new PortableItem(this+"'s arm", 'A'));
+			}
+			else {
+				leg_no -= 1;
+				leg_no = Math.max(0, leg_no);
+				System.out.println(this+" lost its leg");
+			}
+		}
+	}
+	
 }

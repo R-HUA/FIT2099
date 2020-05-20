@@ -17,7 +17,7 @@ public class SayBehaviour implements Behaviour {
 	
 	@Override
 	public  Action getAction(Actor actor, GameMap map) {
-		return null;
+		return new SayAction();
 		
 	}
 

@@ -8,7 +8,7 @@ public class SayAction extends Action {
 
 	@Override
 	public String execute(Actor actor, GameMap map) {
-		String result = actor + " saying ¡°Braaaaains¡±" ;
+		String result = actor + " says ¡°Braaaaains¡±" ;
 		return result;
 	}
 
