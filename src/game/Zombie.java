@@ -22,6 +22,7 @@ public class Zombie extends ZombieActor {
 
 	private int arm_no;
 	private int leg_no;
+	private String lostLimb;
 	private int turn;
 
 	/**
@@ -70,13 +71,20 @@ public class Zombie extends ZombieActor {
 			Behaviour theBehaviour = new SayBehaviour();
 			return theBehaviour.getAction(this, map);
 		}
+		
+		//  Lost limbs drop to the ground
+		if (lostLimb!=null) {
+			System.out.println(this+" lost its "+lostLimb);
+			map.locationOf(this).addItem(new PortableItem("Zombie's "+lostLimb, lostLimb.charAt(0)));
+		}
+		
 		// check the number of arms and legs
-		//TODO
 		if (arm_no == 0) {
-			for (Item item : this.getInventory()) {
-				this.removeItemFromInventory(item);
-				map.locationOf(this).addItem(item);
-			}
+			Actions dropActions = new Actions();
+			for (Item item : this.getInventory())
+				dropActions.add(item.getDropAction());
+			for (Action drop : dropActions)		
+				drop.execute(this, map);
 		}
 		if (leg_no == 0 || (leg_no == 1 && turn % 2 != 0)) {
 			Behaviour[] thisBehaviours = { new AttackBehaviour(ZombieCapability.ALIVE), new PickItemBehaviour() };
@@ -106,15 +114,16 @@ public class Zombie extends ZombieActor {
 			if (rand.nextBoolean()) {
 				arm_no -= 1;
 				arm_no = Math.max(0, arm_no);
-				System.out.println(this+" lost its arm");
-				// TODO  Lost limbs drop to the ground
-				//map.locationOf(this).addItem(new PortableItem(this+"'s arm", 'A'));
+				lostLimb="arm";
 			}
 			else {
 				leg_no -= 1;
 				leg_no = Math.max(0, leg_no);
-				System.out.println(this+" lost its leg");
+				lostLimb="leg";
 			}
+		}
+		else {
+			lostLimb=null;
 		}
 	}
 	
